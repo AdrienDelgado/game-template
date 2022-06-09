@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:game_template/src/game/view/game_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart' hide Level;
 import 'package:provider/provider.dart';
@@ -56,65 +57,66 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
       ],
       child: IgnorePointer(
         ignoring: _duringCelebration,
-        child: Scaffold(
-          backgroundColor: palette.backgroundPlaySession,
-          body: Stack(
-            children: [
-              Center(
-                // This is the entirety of the "game".
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: InkResponse(
-                        onTap: () => GoRouter.of(context).push('/settings'),
-                        child: Image.asset(
-                          'assets/images/settings.png',
-                          semanticLabel: 'Settings',
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Text('Drag the slider to ${widget.level.difficulty}%'
-                        ' or above!'),
-                    Consumer<LevelState>(
-                      builder: (context, levelState, child) => Slider(
-                        label: 'Level Progress',
-                        autofocus: true,
-                        value: levelState.progress / 100,
-                        onChanged: (value) =>
-                            levelState.setProgress((value * 100).round()),
-                        onChangeEnd: (value) => levelState.evaluate(),
-                      ),
-                    ),
-                    const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () => GoRouter.of(context).pop(),
-                          child: const Text('Back'),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox.expand(
-                child: Visibility(
-                  visible: _duringCelebration,
-                  child: IgnorePointer(
-                    child: Confetti(
-                      isStopped: !_duringCelebration,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        child: GamePage(),
+        // child: Scaffold(
+        //   backgroundColor: palette.backgroundPlaySession,
+        //   body: Stack(
+        //     children: [
+        //       Center(
+        //         // This is the entirety of the "game".
+        //         child: Column(
+        //           mainAxisAlignment: MainAxisAlignment.center,
+        //           children: [
+        //             Align(
+        //               alignment: Alignment.centerRight,
+        //               child: InkResponse(
+        //                 onTap: () => GoRouter.of(context).push('/settings'),
+        //                 child: Image.asset(
+        //                   'assets/images/settings.png',
+        //                   semanticLabel: 'Settings',
+        //                 ),
+        //               ),
+        //             ),
+        //             const Spacer(),
+        //             Text('Drag the slider to ${widget.level.difficulty}%'
+        //                 ' or above!'),
+        //             Consumer<LevelState>(
+        //               builder: (context, levelState, child) => Slider(
+        //                 label: 'Level Progress',
+        //                 autofocus: true,
+        //                 value: levelState.progress / 100,
+        //                 onChanged: (value) =>
+        //                     levelState.setProgress((value * 100).round()),
+        //                 onChangeEnd: (value) => levelState.evaluate(),
+        //               ),
+        //             ),
+        //             const Spacer(),
+        //             Padding(
+        //               padding: const EdgeInsets.all(8.0),
+        //               child: SizedBox(
+        //                 width: double.infinity,
+        //                 child: ElevatedButton(
+        //                   onPressed: () => GoRouter.of(context).pop(),
+        //                   child: const Text('Back'),
+        //                 ),
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //       SizedBox.expand(
+        //         child: Visibility(
+        //           visible: _duringCelebration,
+        //           child: IgnorePointer(
+        //             child: Confetti(
+        //               isStopped: !_duringCelebration,
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ),
     );
   }

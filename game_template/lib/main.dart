@@ -72,7 +72,7 @@ void guardedMain() {
 
   _log.info('Going full screen');
   SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.edgeToEdge,
+    SystemUiMode.immersive,
   );
 
   // TODO: When ready, uncomment the following lines to enable integrations.
