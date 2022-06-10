@@ -3,12 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_template/src/game/bloc/ingredient_matrix_bloc.dart';
 import 'package:game_template/src/game/gameplay/sort_gameplay.dart';
-import 'package:logging/logging.dart';
 
 class GamePage extends StatelessWidget {
   const GamePage({super.key});
-
-  static final _log = Logger('GamePage');
 
   @override
   Widget build(BuildContext context) {
