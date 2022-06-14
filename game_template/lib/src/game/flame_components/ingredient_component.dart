@@ -74,15 +74,27 @@ class _GridMoveBehavior extends Behavior<InteractableIngredientComponent>
   static final _log = Logger('_GridMoveBehavior');
   @override
   bool onTapDown(TapDownInfo info) {
-    _log.info('sending dummy event');
+    _log.fine('sending dummy event');
     bloc.add(DummyTapEvent());
     return super.onTapDown(info);
   }
 
   @override
   void onNewState(IngredientMatrixState state) {
-    _log.info('receiving new state');
+    _log.fine('receiving new state');
     super.onNewState(state);
+  }
+
+  @override
+  Future<void> onLoad() {
+    // TODO: implement onLoad
+    return super.onLoad();
+  }
+
+  @override
+  void onMount() {
+    // TODO: implement onMount
+    super.onMount();
   }
 }
 

@@ -2,6 +2,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_template/src/game/bloc/ingredient_matrix_bloc.dart';
+import 'package:game_template/src/game/bloc/level_status_bloc.dart';
 import 'package:game_template/src/game/gameplay/sort_gameplay.dart';
 
 class GamePage extends StatelessWidget {
@@ -9,8 +10,15 @@ class GamePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => IngredientMatrixBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => IngredientMatrixBloc(),
+        ),
+        BlocProvider(
+          create: (context) => LevelStatusBloc(),
+        ),
+      ],
       child: Scaffold(
         body: Center(
           child: GameView(),

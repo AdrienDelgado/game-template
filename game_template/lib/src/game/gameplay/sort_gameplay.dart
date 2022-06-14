@@ -15,6 +15,8 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
 
   static final _log = Logger('SortGameplay');
 
+  final Component world = PositionComponent();
+
   late final Map<IngredientType, Sprite> ingredientSprites;
 
   final IngredientMatrixBloc ingredientMatrixBloc;
@@ -25,27 +27,37 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
     _log.info('game window size: $size');
     ingredientSprites = await SpriteHelper.getIngredientSprites();
 
+    await world.addAll(
+      [
+        // TODO: Dummy test case
+        InteractableIngredientComponent(
+          ingredient: Ingredient(type: IngredientType.bread),
+          position: size / 2,
+          size: Vector2(size.x, size.x * IngredientConstants.imageSimpleRatio),
+        ),
+        // TODO: Dummy test case
+        IngredientComponent(
+          ingredient: Ingredient(type: IngredientType.bacon),
+          position: size / 2,
+          size: Vector2(size.x, size.x * IngredientConstants.imageSimpleRatio),
+        ),
+        IngredientLoader(),
+      ],
+    );
+
     await addAll(
       [
-        FlameMultiBlocProvider(providers: [
-          FlameBlocProvider<IngredientMatrixBloc, IngredientMatrixState>.value(
-            value: ingredientMatrixBloc,
-          ),
-        ], children: [
-          // TODO: Dummy test case
-          InteractableIngredientComponent(
-            ingredient: Ingredient(type: IngredientType.bread),
-            position: size / 2,
-            size: Vector2(size.x, size.x * IngredientConstants.simpleRatio),
-          ),
-          // TODO: Dummy test case
-          IngredientComponent(
-            ingredient: Ingredient(type: IngredientType.bacon),
-            position: size / 2,
-            size: Vector2(size.x, size.x * IngredientConstants.simpleRatio),
-          ),
-          IngredientLoader(),
-        ]),
+        FlameMultiBlocProvider(
+          providers: [
+            FlameBlocProvider<IngredientMatrixBloc,
+                IngredientMatrixState>.value(
+              value: ingredientMatrixBloc,
+            ),
+          ],
+          children: [
+            world,
+          ],
+        ),
       ],
     );
   }
