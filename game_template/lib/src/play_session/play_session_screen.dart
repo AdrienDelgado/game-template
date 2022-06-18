@@ -57,7 +57,9 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
       ],
       child: IgnorePointer(
         ignoring: _duringCelebration,
-        child: GamePage(),
+        child: GamePage(
+          level: widget.level,
+        ),
         // child: Scaffold(
         //   backgroundColor: palette.backgroundPlaySession,
         //   body: Stack(

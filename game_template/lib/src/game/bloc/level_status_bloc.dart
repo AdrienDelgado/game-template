@@ -9,5 +9,11 @@ class LevelStatusBloc extends Bloc<LevelStatusEvent, LevelStatusState> {
     on<LevelStatusEvent>((event, emit) {
       // TODO: implement event handler
     });
+
+    on<StartLoadingIngredientsEvent>(
+      (_, emit) => emit.call(
+        InitialLoadingState(),
+      ),
+    );
   }
 }

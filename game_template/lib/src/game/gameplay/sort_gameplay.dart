@@ -3,16 +3,22 @@ import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:game_template/src/constants/ingredient_constants.dart';
 import 'package:game_template/src/game/bloc/ingredient_matrix_bloc.dart';
+import 'package:game_template/src/game/bloc/level_status_bloc.dart';
 import 'package:game_template/src/game/flame_components/ingredient_component.dart';
 import 'package:game_template/src/game/flame_components/ingredient_loader.dart';
 import 'package:game_template/src/helpers/matrix_helper.dart';
+import 'package:game_template/src/level_selection/levels.dart';
 import 'package:logging/logging.dart';
 
 import '../../data/models/ingredient.dart';
 import '../../helpers/sprite_helper.dart';
 
 class SortGameplay extends FlameGame with HasTappables, HasDraggables {
-  SortGameplay({required this.ingredientMatrixBloc});
+  SortGameplay({
+    required this.ingredientMatrixBloc,
+    required this.levelStatusBloc,
+    required this.level,
+  });
 
   static final _log = Logger('SortGameplay');
 
@@ -23,6 +29,10 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
   late final Map<IngredientType, Sprite> ingredientSprites;
 
   final IngredientMatrixBloc ingredientMatrixBloc;
+
+  final LevelStatusBloc levelStatusBloc;
+
+  final GameLevel level;
 
   // TODO: remove dummy method. testing purposes only
   @override
@@ -48,6 +58,11 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
     await world.addAll(
       [
         // TODO remove, dummy example
+        TextBoxComponent(
+          text: 'READY',
+          size: size,
+          priority: 10,
+        ),
         IngredientComponent(
           ingredient: Ingredient(type: IngredientType.cheese),
           position: MatrixHelper.getIngredientPositionInMatrixArea(
@@ -65,7 +80,7 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
           ),
         ),
         matrixComponent,
-        IngredientLoader(),
+        IngredientLoader(matrixComponent: matrixComponent),
       ],
     );
 
@@ -84,7 +99,5 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
         ),
       ],
     );
-
-    
   }
 }

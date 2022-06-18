@@ -10,6 +10,12 @@ class IngredientLoader extends Component
         FlameBlocReader<IngredientMatrixBloc, IngredientMatrixState>,
         FlameBlocListenable<IngredientMatrixBloc, IngredientMatrixState> {
   static final _log = Logger('IngredientLoader');
+
+  // The matrix component of the level. It is already positioned correctly in
+  // the game view, so components can directly be placed as childen of this.
+  IngredientLoader({required this.matrixComponent});
+
+  final PositionComponent matrixComponent;
   @override
   void onNewState(IngredientMatrixState state) {
     _log.info('parent of this component is of type ${parent.runtimeType}');

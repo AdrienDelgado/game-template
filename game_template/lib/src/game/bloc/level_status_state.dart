@@ -4,3 +4,5 @@ part of 'level_status_bloc.dart';
 abstract class LevelStatusState {}
 
 class LevelStatusInitial extends LevelStatusState {}
+
+class InitialLoadingState extends LevelStatusState {}
