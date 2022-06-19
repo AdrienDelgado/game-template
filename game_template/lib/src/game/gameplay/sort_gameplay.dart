@@ -26,6 +26,8 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
 
   final matrixComponent = PositionComponent();
 
+  late final IngredientLoader ingredientLoader;
+
   late final Map<IngredientType, Sprite> ingredientSprites;
 
   final IngredientMatrixBloc ingredientMatrixBloc;
@@ -33,6 +35,8 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
   final LevelStatusBloc levelStatusBloc;
 
   final GameLevel level;
+
+  late final Vector2 matrixAreaSize;
 
   // TODO: remove dummy method. testing purposes only
   @override
@@ -48,7 +52,11 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
 
     matrixComponent.position = matrixPosition;
 
-    final matrixAreaSize = MatrixHelper.getMatrixAreaSize(
+    ingredientLoader = IngredientLoader(
+      matrixComponent: matrixComponent,
+    );
+
+    matrixAreaSize = MatrixHelper.getMatrixAreaSize(
       playAreaSize: MatrixHelper.getPlayAreaSize(size),
       nColumns: nColumns,
       nRows: nRows,
@@ -80,7 +88,7 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
           ),
         ),
         matrixComponent,
-        IngredientLoader(matrixComponent: matrixComponent),
+        ingredientLoader,
       ],
     );
 

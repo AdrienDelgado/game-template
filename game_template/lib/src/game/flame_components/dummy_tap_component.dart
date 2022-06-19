@@ -33,7 +33,7 @@ class DummyTapComponent extends CircleComponent
   @override
   bool onTapDown(TapDownInfo info) {
     _log.info('sending dummy event');
-    bloc.add(DummyTapEvent());
+    // bloc.add(DummyTapEvent());
     return super.onTapDown(info);
   }
 }

@@ -75,7 +75,7 @@ class _GridMoveBehavior extends Behavior<InteractableIngredientComponent>
   @override
   bool onTapDown(TapDownInfo info) {
     _log.fine('sending dummy event');
-    bloc.add(DummyTapEvent());
+    // bloc.add(DummyTapEvent());
     return super.onTapDown(info);
   }
 

@@ -1,8 +1,13 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:game_template/src/constants/ingredient_constants.dart';
 import 'package:game_template/src/constants/level_design_constants.dart';
+
+import '../data/models/ingredient.dart';
+import '../game/bloc/ingredient_matrix_bloc.dart';
+import '../game/flame_components/ingredient_component.dart';
 
 abstract class MatrixHelper {
   /// This method gives an ingredient size based on total available play zone
@@ -111,5 +116,54 @@ abstract class MatrixHelper {
             (playAreaSize.x - matrixAreaSize.x) / 2;
 
     return Vector2(horizontalPosition, verticalPosition);
+  }
+
+  /// This method builds the initial matrix of ingredients based on level
+  ///  properties: number of columns, number of rows, seed
+  static List<List<IngredientComponent?>> buildInitialMatrix({
+    required Vector2 matrixAreaSize,
+    required LevelDetailsLoadedEvent event,
+    required Random random,
+  }) {
+    List<List<IngredientComponent?>> ingredientMatrix = List.generate(
+      event.nColumns,
+      (column) => List.generate(
+        event.nRows,
+        (row) => IngredientComponent(
+          ingredient: Ingredient(
+            type: IngredientType
+                .values[random.nextInt(IngredientType.values.length)],
+          ),
+          position: getIngredientPositionInMatrixArea(
+            matrixAreaSize: matrixAreaSize,
+            nColumns: event.nColumns,
+            nRows: event.nRows,
+            column: column,
+            row: row,
+          ),
+        ),
+      ),
+    );
+
+    return ingredientMatrix;
+  }
+
+  /// Returns the mapping of each component via its id to its position in the
+  ///  matrix as an int list. To get the position, we will need to treat the
+  ///  first element of the list as the column, and the second as the row
+  static Map<String, List<int>> buildInitialPositionMapping(
+      List<List<IngredientComponent?>> ingredientMatrix) {
+    final positionMapping = HashMap<String, List<int>>();
+
+    for (int column = 0; column < ingredientMatrix.length; column++) {
+      for (int row = 0; row < ingredientMatrix[0].length; row++) {
+        positionMapping.putIfAbsent(
+          ingredientMatrix[column][row]!.id,
+          () => [column, row],
+        );
+      }
+    }
+
+    return positionMapping;
   }
 }
