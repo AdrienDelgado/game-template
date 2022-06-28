@@ -1,14 +1,10 @@
 import 'package:flame/components.dart';
-import 'package:flame_behaviors/flame_behaviors.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:game_template/src/game/bloc/ingredient_matrix_bloc.dart';
-import 'package:game_template/src/game/bloc/level_status_bloc.dart';
 import 'package:game_template/src/game/gameplay/sort_gameplay.dart';
 import 'package:logging/logging.dart';
 
-import '../../level_selection/levels.dart';
-
-class IngredientLoader extends Entity
+class IngredientLoader extends Component
     with
         HasGameRef<SortGameplay>,
         FlameBlocListenable<IngredientMatrixBloc, IngredientMatrixState>,
@@ -19,26 +15,31 @@ class IngredientLoader extends Entity
   // the game view, so components can directly be placed as childen of this.
   IngredientLoader({
     required this.matrixComponent,
-  }) : super(
-          behaviors: [_LevelStatusListener()],
-        );
+  });
 
   final PositionComponent matrixComponent;
 
-  void test() {}
+  @override
+  void onMount() {
+    _log.fine('$runtimeType was mounted on ${parent.runtimeType}');
+    super.onMount();
+  }
 
   @override
   Future<void> onNewState(IngredientMatrixState state) async {
-    if (state is InitialLoadingState) {
-      //   for (final burger in state.ingredientMatrix) {
-      //     for (final component in burger) {
-      //       component!.position.add(gameRef.ingredientMatrixOffset);
-      //       component.positionInMatrix =
-      //           state.ingredientPositionsMapping[component.id]!;
-      //       await gameRef.add(component);
-      //     }
-      //   }
-      //   gameRef.read<IngredientMatrixBloc>().add(const ComponentsLoadedEvent());
+    _log.fine('received new ${state.runtimeType} state');
+    if (state is IngredientMatrixFirstFilled) {
+      _log.info(
+          'Matrix has size: ${state.ingredientMatrix.length}, ${state.ingredientMatrix.first.length}');
+      for (final burger in state.ingredientMatrix) {
+        for (final component in burger) {
+          component!.positionInMatrix =
+              state.ingredientPositionsMapping[component.id]!;
+          await gameRef.matrixComponent.add(component);
+        }
+      }
+      _log.fine('loaded all components');
+      bloc.add(const ComponentsLoadedEvent());
       // } else if (state is IngredientMatrixActiveState) {
       //   if (state.newComponentsCount == null) {
       //     return;
@@ -76,21 +77,6 @@ class IngredientLoader extends Entity
       //       component.playMoveEffect();
       //     }
       //   }
-    }
-  }
-}
-
-class _LevelStatusListener extends Behavior<IngredientLoader>
-    with
-        HasGameRef<SortGameplay>,
-        FlameBlocListenable<LevelStatusBloc, LevelStatusState>,
-        FlameBlocReader<LevelStatusBloc, LevelStatusState> {
-  @override
-  void onNewState(LevelStatusState state) {
-    switch (state.runtimeType) {
-      case InitialLoadingState:
-        break;
-      default:
     }
   }
 }

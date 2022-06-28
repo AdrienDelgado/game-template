@@ -1,13 +1,13 @@
 part of 'ingredient_matrix_bloc.dart';
 
 abstract class IngredientMatrixState extends Equatable {
-  late final List<List<IngredientComponent?>> ingredientMatrix;
+  late final List<List<InteractableIngredientComponent?>> ingredientMatrix;
   late final Map<String, List<int>> ingredientPositionsMapping;
-  late final int nbColumns;
-  late final int nbRows;
+  late final int nColumns;
+  late final int nRows;
   late final Random random;
   late final String heldIngredientId;
-  late final IngredientComponent? heldIngredient;
+  late final InteractableIngredientComponent? heldIngredient;
   late final Map<int, int>? newComponentsCount;
   late final Vector2 matrixAreaSize;
 
@@ -22,15 +22,16 @@ class IngredientMatrixInitialState extends IngredientMatrixState {
 
 class IngredientMatrixFirstFilled extends IngredientMatrixState {
   IngredientMatrixFirstFilled({
-    required final List<List<IngredientComponent?>> ingredientMatrix,
+    required final List<List<InteractableIngredientComponent?>>
+        ingredientMatrix,
     required final Map<String, List<int>> ingredientPositionsMapping,
     required final Random random,
     required final Vector2 matrixAreaSize,
   }) {
     this.ingredientMatrix = ingredientMatrix;
     this.ingredientPositionsMapping = ingredientPositionsMapping;
-    nbColumns = ingredientMatrix.length;
-    nbRows = ingredientMatrix[0].length;
+    nColumns = ingredientMatrix.length;
+    nRows = ingredientMatrix[0].length;
     this.random = random;
     this.matrixAreaSize = matrixAreaSize;
   }
@@ -41,20 +42,21 @@ class IngredientMatrixFirstFilled extends IngredientMatrixState {
 
 class IngredientMatrixActiveState extends IngredientMatrixState {
   IngredientMatrixActiveState({
-    required final List<List<IngredientComponent?>> ingredientMatrix,
+    required final List<List<InteractableIngredientComponent?>>
+        ingredientMatrix,
     required final Map<String, List<int>> ingredientPositionsMapping,
-    required final int nbColumns,
-    required final int nbRows,
+    required final int nColumns,
+    required final int nRows,
     required final Random random,
     required final String heldIngredientId,
     required final Vector2 matrixAreaSize,
-    final IngredientComponent? heldIngredient,
+    final InteractableIngredientComponent? heldIngredient,
     final Map<int, int>? newComponentsCount,
   }) {
     this.ingredientMatrix = ingredientMatrix;
     this.ingredientPositionsMapping = ingredientPositionsMapping;
-    this.nbColumns = nbColumns;
-    this.nbRows = nbRows;
+    this.nColumns = nColumns;
+    this.nRows = nRows;
     this.random = random;
     this.heldIngredientId = heldIngredientId;
     this.heldIngredient = heldIngredient;
@@ -63,14 +65,14 @@ class IngredientMatrixActiveState extends IngredientMatrixState {
   }
 
   IngredientMatrixActiveState copyWith({
-    final List<List<IngredientComponent?>>? ingredientMatrix,
+    final List<List<InteractableIngredientComponent?>>? ingredientMatrix,
     final Map<String, List<int>>? ingredientPositionsMapping,
-    final int? nbColumns,
-    final int? nbRows,
+    final int? nColumns,
+    final int? nRows,
     final Random? random,
     final String? heldIngredientId,
     // WARNING! heldIngredient has to be specifically written every time
-    required final IngredientComponent? heldIngredient,
+    required final InteractableIngredientComponent? heldIngredient,
     final Map<int, int>? newComponentsCount,
     required final Vector2? matrixAreaSize,
   }) {
@@ -78,8 +80,8 @@ class IngredientMatrixActiveState extends IngredientMatrixState {
       ingredientMatrix: ingredientMatrix ?? this.ingredientMatrix,
       ingredientPositionsMapping:
           ingredientPositionsMapping ?? this.ingredientPositionsMapping,
-      nbColumns: nbColumns ?? this.nbColumns,
-      nbRows: nbRows ?? this.nbRows,
+      nColumns: nColumns ?? this.nColumns,
+      nRows: nRows ?? this.nRows,
       random: random ?? this.random,
       heldIngredientId: heldIngredientId ?? this.heldIngredientId,
       heldIngredient: heldIngredient,
@@ -92,8 +94,8 @@ class IngredientMatrixActiveState extends IngredientMatrixState {
   List<Object> get props => [
         ingredientPositionsMapping.toString(),
         ingredientMatrix.toString(),
-        nbColumns,
-        nbRows,
+        nColumns,
+        nRows,
         heldIngredientId,
       ];
 }

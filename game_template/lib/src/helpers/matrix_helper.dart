@@ -14,13 +14,13 @@ abstract class MatrixHelper {
   /// size, number of columns, and number of rows. If `isDouble` is set to
   ///  `true`, gives the size for a double size ingredient.
   static Vector2 getIngredientSize({
-    required Vector2 matrixAreaSize,
+    required Vector2 playAreaSize,
     required int nColumns,
     required int nRows,
     bool isDouble = false,
   }) {
-    final double maxWidthBasedOnWidth = matrixAreaSize.x / (nColumns + 2);
-    final double maxHeightBasedOnHeight = matrixAreaSize.y / (nRows + 2);
+    final double maxWidthBasedOnWidth = playAreaSize.x / (nColumns + 2);
+    final double maxHeightBasedOnHeight = playAreaSize.y / (nRows + 2);
     final double width = min(maxWidthBasedOnWidth,
         maxHeightBasedOnHeight / IngredientConstants.imageSimpleRatio);
     final double height = width *
@@ -40,7 +40,7 @@ abstract class MatrixHelper {
     required int nRows,
   }) {
     final size = getIngredientSize(
-      matrixAreaSize: playAreaSize,
+      playAreaSize: playAreaSize,
       nColumns: nColumns,
       nRows: nRows,
     );
@@ -120,16 +120,27 @@ abstract class MatrixHelper {
 
   /// This method builds the initial matrix of ingredients based on level
   ///  properties: number of columns, number of rows, seed
-  static List<List<IngredientComponent?>> buildInitialMatrix({
+  static List<List<InteractableIngredientComponent?>> buildInitialMatrix({
     required Vector2 matrixAreaSize,
     required LevelDetailsLoadedEvent event,
     required Random random,
   }) {
-    List<List<IngredientComponent?>> ingredientMatrix = List.generate(
+    // final ingredientSize = getIngredientSize(
+    //   playAreaSize: matrixAreaSize,
+    //   nColumns: event.nColumns,
+    //   nRows: event.nRows,
+    // );
+    final ingredientSize = Vector2(
+      matrixAreaSize.x / (event.nColumns + 2),
+      matrixAreaSize.y / (event.nRows + 1),
+    );
+
+    List<List<InteractableIngredientComponent?>> ingredientMatrix =
+        List.generate(
       event.nColumns,
       (column) => List.generate(
         event.nRows,
-        (row) => IngredientComponent(
+        (row) => InteractableIngredientComponent(
           ingredient: Ingredient(
             type: IngredientType
                 .values[random.nextInt(IngredientType.values.length)],
@@ -141,6 +152,7 @@ abstract class MatrixHelper {
             column: column,
             row: row,
           ),
+          size: ingredientSize,
         ),
       ),
     );
@@ -152,11 +164,11 @@ abstract class MatrixHelper {
   ///  matrix as an int list. To get the position, we will need to treat the
   ///  first element of the list as the column, and the second as the row
   static Map<String, List<int>> buildInitialPositionMapping(
-      List<List<IngredientComponent?>> ingredientMatrix) {
+      List<List<InteractableIngredientComponent?>> ingredientMatrix) {
     final positionMapping = HashMap<String, List<int>>();
 
     for (int column = 0; column < ingredientMatrix.length; column++) {
-      for (int row = 0; row < ingredientMatrix[0].length; row++) {
+      for (int row = 0; row < ingredientMatrix.first.length; row++) {
         positionMapping.putIfAbsent(
           ingredientMatrix[column][row]!.id,
           () => [column, row],
@@ -165,5 +177,26 @@ abstract class MatrixHelper {
     }
 
     return positionMapping;
+  }
+
+  /// This method checks is given indices are valid matrix coordinates
+  static bool isValidLocation({
+    required final int col,
+    required final int row,
+    required final List<List<InteractableIngredientComponent?>>
+        ingredientMatrix,
+  }) {
+    // Check if matrix size is null or if we access negative indices
+    if (ingredientMatrix.isEmpty || col < 0 || row < 0) {
+      return false;
+    }
+
+    // check if indices are withing bounds of the matrix
+    if (col >= ingredientMatrix.length ||
+        row >= ingredientMatrix.first.length) {
+      return false;
+    }
+
+    return true;
   }
 }

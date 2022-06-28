@@ -21,3 +21,10 @@ class LevelDetailsLoadedEvent extends IngredientMatrixEvent {
   @override
   List<Object> get props => [nColumns, nRows];
 }
+
+class ComponentsLoadedEvent extends IngredientMatrixEvent {
+  const ComponentsLoadedEvent();
+
+  @override
+  List<Object?> get props => [];
+}

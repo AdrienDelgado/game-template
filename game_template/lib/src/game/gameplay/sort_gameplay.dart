@@ -1,11 +1,13 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame/palette.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:game_template/src/constants/ingredient_constants.dart';
 import 'package:game_template/src/game/bloc/ingredient_matrix_bloc.dart';
 import 'package:game_template/src/game/bloc/level_status_bloc.dart';
 import 'package:game_template/src/game/flame_components/ingredient_component.dart';
 import 'package:game_template/src/game/flame_components/ingredient_loader.dart';
+import 'package:game_template/src/game/flame_components/starter_component.dart';
 import 'package:game_template/src/helpers/matrix_helper.dart';
 import 'package:game_template/src/level_selection/levels.dart';
 import 'package:logging/logging.dart';
@@ -24,7 +26,8 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
 
   final world = PositionComponent();
 
-  final matrixComponent = PositionComponent();
+  final matrixComponent = RectangleComponent();
+  // final matrixComponent = PositionComponent();
 
   late final IngredientLoader ingredientLoader;
 
@@ -43,12 +46,9 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
   Future<void> onLoad() async {
     _log.info('game window size: $size');
     ingredientSprites = await SpriteHelper.getIngredientSprites();
-    final nColumns = 1;
-    final nRows = 10;
 
     final matrixPosition = MatrixHelper.getMatrixAreaPosition(
-        gameSize: size, nColumns: nColumns, nRows: nRows);
-    _log.info('matrixPosition: $matrixPosition');
+        gameSize: size, nColumns: level.nColumns, nRows: level.nRows);
 
     matrixComponent.position = matrixPosition;
 
@@ -58,39 +58,14 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
 
     matrixAreaSize = MatrixHelper.getMatrixAreaSize(
       playAreaSize: MatrixHelper.getPlayAreaSize(size),
-      nColumns: nColumns,
-      nRows: nRows,
+      nColumns: level.nColumns,
+      nRows: level.nRows,
     );
-    _log.info('matrixAreaSize: $matrixAreaSize');
 
-    await world.addAll(
-      [
-        // TODO remove, dummy example
-        TextBoxComponent(
-          text: 'READY',
-          size: size,
-          priority: 10,
-        ),
-        IngredientComponent(
-          ingredient: Ingredient(type: IngredientType.cheese),
-          position: MatrixHelper.getIngredientPositionInMatrixArea(
-                matrixAreaSize: matrixAreaSize,
-                nColumns: nColumns,
-                nRows: nRows,
-                column: 0,
-                row: 0,
-              ) +
-              matrixPosition,
-          size: MatrixHelper.getIngredientSize(
-            matrixAreaSize: matrixAreaSize,
-            nColumns: nColumns,
-            nRows: nRows,
-          ),
-        ),
-        matrixComponent,
-        ingredientLoader,
-      ],
-    );
+    matrixComponent.size = matrixAreaSize;
+    matrixComponent.paint = BasicPalette.blue.paint();
+    _log.info(
+        'matrixPosition: $matrixPosition, matrixAreaSize: $matrixAreaSize');
 
     await addAll(
       [
@@ -100,12 +75,26 @@ class SortGameplay extends FlameGame with HasTappables, HasDraggables {
                 IngredientMatrixState>.value(
               value: ingredientMatrixBloc,
             ),
+            FlameBlocProvider<LevelStatusBloc, LevelStatusState>.value(
+              value: levelStatusBloc,
+            ),
           ],
           children: [
             world,
           ],
         ),
       ],
+    );
+
+    await world.addAll(
+      [
+        matrixComponent,
+        ingredientLoader,
+      ],
+    );
+
+    await world.add(
+      StarterComponent(text: 'READY'),
     );
   }
 }

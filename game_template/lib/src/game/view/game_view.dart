@@ -16,15 +16,19 @@ class GamePage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => IngredientMatrixBloc(),
+          create: (context) => LevelStatusBloc(),
         ),
         BlocProvider(
-          create: (context) => LevelStatusBloc(),
+          create: (context) => IngredientMatrixBloc(
+            levelStatusBloc: context.read<LevelStatusBloc>(),
+          ),
         ),
       ],
       child: Scaffold(
         body: Center(
-          child: GameView(level: level,),
+          child: GameView(
+            level: level,
+          ),
         ),
       ),
     );
