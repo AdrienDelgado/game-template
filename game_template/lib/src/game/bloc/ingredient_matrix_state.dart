@@ -74,7 +74,7 @@ class IngredientMatrixActiveState extends IngredientMatrixState {
     // WARNING! heldIngredient has to be specifically written every time
     required final InteractableIngredientComponent? heldIngredient,
     final Map<int, int>? newComponentsCount,
-    required final Vector2? matrixAreaSize,
+    final Vector2? matrixAreaSize,
   }) {
     return IngredientMatrixActiveState(
       ingredientMatrix: ingredientMatrix ?? this.ingredientMatrix,

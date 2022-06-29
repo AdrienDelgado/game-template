@@ -12,6 +12,7 @@ import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../data/models/later_move_effect.dart';
+import '../../data/models/swipe_side.dart';
 import '../../helpers/matrix_helper.dart';
 import '../gameplay/sort_gameplay.dart';
 
@@ -35,14 +36,12 @@ class IngredientComponent extends SpriteComponent
 
   @override
   Future<void>? onLoad() {
-    _log.fine(
-        'Loaded ${ingredient.type.name} ingredient on position $position with size $size');
     sprite = gameRef.ingredientSprites[ingredient.type]!;
     return super.onLoad();
   }
 }
 
-class InteractableIngredientComponent extends Entity {
+class InteractableIngredientComponent extends Entity with Tappable {
   InteractableIngredientComponent({
     required Ingredient ingredient,
     super.position,
@@ -56,13 +55,12 @@ class InteractableIngredientComponent extends Entity {
             ),
           ],
           behaviors: [
-            _GridMoveBehavior(),
             _EffectBehavior(),
+            _GridMoveBehavior(),
+            _GestureBehavior(),
           ],
           anchor: Anchor.center,
-        ) {
-    _log.info('initial: size $size, position $position');
-  }
+        );
 
   String get id => _id;
   Ingredient get ingredient =>
@@ -92,20 +90,12 @@ class InteractableIngredientComponent extends Entity {
 
   // If the component is moving
   bool isMoving = false;
-
-  @override
-  Future<void>? onLoad() {
-    _log.fine(
-        'Loaded ingredient on position $position with size $size');
-    return super.onLoad();
-  }
 }
 
-class _GridMoveBehavior extends Behavior<InteractableIngredientComponent>
+class _GridMoveBehavior
+    extends DraggableBehavior<InteractableIngredientComponent>
     with
         HasGameRef<SortGameplay>,
-        Tappable,
-        Draggable,
         FlameBlocListenable<IngredientMatrixBloc, IngredientMatrixState>,
         FlameBlocReader<IngredientMatrixBloc, IngredientMatrixState> {
   static final _log = Logger('_GridMoveBehavior');
@@ -259,7 +249,14 @@ class _GridMoveBehavior extends Behavior<InteractableIngredientComponent>
   }
 }
 
-class _EffectBehavior extends Behavior<InteractableIngredientComponent> {
+class _EffectBehavior extends Behavior<InteractableIngredientComponent>
+    with
+        Tappable,
+        Draggable,
+        FlameBlocListenable<IngredientMatrixBloc, IngredientMatrixState>,
+        FlameBlocReader<IngredientMatrixBloc, IngredientMatrixState> {
+  static final _log = Logger('_EffectBehavior');
+
   /// Play the next move effect in the move effect list of the component
   Future<void> playMoveEffect() async {
     if (parent.moveEffects.isEmpty || parent.isMoving) {
@@ -278,6 +275,7 @@ class _EffectBehavior extends Behavior<InteractableIngredientComponent> {
     });
   }
 
+  /// Fades the component out of the game once it was dropped
   void fadeOut({
     required double duration,
     double delay = 0.0,
@@ -317,5 +315,79 @@ class _EffectBehavior extends Behavior<InteractableIngredientComponent> {
         delay: delay + duration,
       ),
     );
+  }
+}
+
+class _GestureBehavior extends Behavior<InteractableIngredientComponent>
+    with
+        HasGameRef<SortGameplay>,
+        Tappable,
+        Draggable,
+        FlameBlocListenable<IngredientMatrixBloc, IngredientMatrixState>,
+        FlameBlocReader<IngredientMatrixBloc, IngredientMatrixState> {
+  static final _log = Logger('_GestureBehavior');
+
+  // This picks up the fact that the ingredient is being held
+  @override
+  bool onTapDown(TapDownInfo info) {
+    _log.fine('onTapDown: ${info.hashCode}');
+    bloc.add(
+      IngredientPickedUpEvent(
+        componentId: parent.id,
+        hashcode: info.hashCode,
+      ),
+    );
+    return super.onTapDown(info);
+  }
+
+  // This releases the ingredient if we did not move it
+  @override
+  bool onTapUp(TapUpInfo info) {
+    bloc.add(
+      IngredientDroppedDownEvent(
+        componentId: parent.id,
+        hashcode: info.hashCode,
+      ),
+    );
+    return super.onTapUp(info);
+  }
+
+  // Checks if we move an ingredient correctly
+  //TODO Change coordinates system
+  @override
+  bool onDragUpdate(DragUpdateInfo info) {
+    if (parent.leftPositionInZone == null ||
+        parent.rightPositionInZone == null ||
+        parent.positionInZone == null) {
+      return false;
+    }
+    SwipeSide side = SwipeSide.none;
+    final distanceBetweenIngredients = Vector2.copy(parent.positionInZone!)
+        .distanceTo(parent.leftPositionInZone!); // TODO HERE
+    final detectionDistance = distanceBetweenIngredients / 2.1;
+
+    if (info.eventPosition.global.distanceTo( // TODO HERE
+            Vector2.copy(parent.leftPositionInZone!)
+              ..add(gameRef.matrixPosition)) <
+        detectionDistance) {
+      side = SwipeSide.left;
+    } else if (info.eventPosition.global.distanceTo( // TODO HERE
+            Vector2.copy(parent.rightPositionInZone!)
+              ..add(gameRef.matrixPosition)) <
+        detectionDistance) {
+      side = SwipeSide.right;
+    }
+
+    if (side != SwipeSide.none) {
+      _log.fine("sending a move with id ${parent.id} and side $side");
+      bloc.add(
+            IngredientSwipedEvent(
+              componentId: parent.id,
+              side: side,
+              dragHash: info.hashCode,
+            ),
+          );
+    }
+    return super.onDragUpdate(info);
   }
 }

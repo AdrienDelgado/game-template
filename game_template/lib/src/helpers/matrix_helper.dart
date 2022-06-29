@@ -160,6 +160,29 @@ abstract class MatrixHelper {
     return ingredientMatrix;
   }
 
+  static InteractableIngredientComponent makeNewIngredient({
+    required Vector2 matrixAreaSize,
+    required int column,
+    required int row,
+    required Random random,
+    required int nColumns,
+    required int nRows,
+  }) {
+    return InteractableIngredientComponent(
+      ingredient: Ingredient(
+        type:
+            IngredientType.values[random.nextInt(IngredientType.values.length)],
+      ),
+      position: getIngredientPositionInMatrixArea(
+        matrixAreaSize: matrixAreaSize,
+        nColumns: nColumns,
+        nRows: nRows,
+        column: column,
+        row: row,
+      ),
+    );
+  }
+
   /// Returns the mapping of each component via its id to its position in the
   ///  matrix as an int list. To get the position, we will need to treat the
   ///  first element of the list as the column, and the second as the row
@@ -198,5 +221,55 @@ abstract class MatrixHelper {
     }
 
     return true;
+  }
+
+  // This method checks if given indices correspond to a valid
+  // ingredient in the matrix
+  static bool isValidIngredient({
+    required final int col,
+    required final int row,
+    required final List<List<InteractableIngredientComponent?>> ingredientMatrix,
+  }) {
+    // Check if location is valid
+    if (!isValidLocation(
+      col: col,
+      row: row,
+      ingredientMatrix: ingredientMatrix,
+    )) {
+      return false;
+    }
+
+    // Check if there is an ingredient there
+    if (ingredientMatrix.elementAt(col).elementAt(row) == null) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // Returns a deep copy of the ingredient matrix
+  static List<List<InteractableIngredientComponent?>> ingredientMatrixDeepCopy(
+      List<List<InteractableIngredientComponent?>> ingredientMatrix) {
+    return List.generate(
+      ingredientMatrix.length,
+      (column) => List.from(
+        ingredientMatrix[column],
+      ),
+    );
+  }
+
+  // Returns a deep copy of the ingredient position mapping
+  static Map<String, List<int>> ingredientPositionsMappingDeepCopy(
+      Map<String, List<int>> ingredientPositionsMapping) {
+    final Map<String, List<int>> deepCopy = HashMap();
+    for (String id in ingredientPositionsMapping.keys) {
+      deepCopy.putIfAbsent(
+        id,
+        () => List.from(
+          ingredientPositionsMapping[id]!,
+        ),
+      );
+    }
+    return deepCopy;
   }
 }

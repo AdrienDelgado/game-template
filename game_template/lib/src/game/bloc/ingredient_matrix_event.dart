@@ -28,3 +28,44 @@ class ComponentsLoadedEvent extends IngredientMatrixEvent {
   @override
   List<Object?> get props => [];
 }
+
+class IngredientPickedUpEvent extends IngredientMatrixEvent {
+  final String componentId;
+  final int hashcode;
+
+  const IngredientPickedUpEvent({
+    required this.componentId,
+    required this.hashcode,
+  });
+
+  @override
+  List<Object> get props => [componentId, hashcode];
+}
+
+class IngredientDroppedDownEvent extends IngredientMatrixEvent {
+  final String componentId;
+  final int hashcode;
+
+  const IngredientDroppedDownEvent({
+    required this.componentId,
+    required this.hashcode,
+  });
+
+  @override
+  List<Object> get props => [componentId, hashcode];
+}
+
+class IngredientSwipedEvent extends IngredientMatrixEvent {
+  final String componentId;
+  final int dragHash;
+  final SwipeSide side;
+
+  const IngredientSwipedEvent({
+    required this.componentId,
+    required this.side,
+    required this.dragHash,
+  });
+
+  @override
+  List<Object> get props => [componentId, dragHash, side.toString()];
+}
